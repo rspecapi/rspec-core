@@ -1466,6 +1466,11 @@ module RSpec::Core
           expect(config.randomize?).to be_falsey
         end
       end
+
+      it 'is deprecated' do
+        expect_warn_deprecation_with_call_site(__FILE__, __LINE__ + 1, /randomize\?/)
+        config.randomize?
+      end
     end
 
     describe '#order=' do
@@ -1512,7 +1517,10 @@ module RSpec::Core
     end
 
     describe "#order_examples" do
-      before { RSpec.stub(:configuration => config) }
+      before do
+        allow_deprecation
+        RSpec.stub(:configuration => config)
+      end
 
       it 'sets a block that determines the ordering of a collection extended with Extensions::Ordered::Examples' do
         examples = [1, 2, 3, 4]
@@ -1525,6 +1533,11 @@ module RSpec::Core
         config.order_examples { |examples| examples.reverse }
         expect(config.order).to eq("custom")
       end
+
+      it 'prints a deprecation warning' do
+        expect_deprecation_with_call_site(__FILE__, __LINE__ + 1, /RSpec::Configuration#order_examples/)
+        config.order_examples { }
+      end
     end
 
     describe "#example_ordering_block" do
@@ -1534,7 +1547,10 @@ module RSpec::Core
     end
 
     describe "#order_groups" do
-      before { RSpec.stub(:configuration => config) }
+      before do
+        allow_deprecation
+        RSpec.stub(:configuration => config)
+      end
 
       it 'sets a block that determines the ordering of a collection extended with Extensions::Ordered::ExampleGroups' do
         groups = [1, 2, 3, 4]
@@ -1546,6 +1562,11 @@ module RSpec::Core
       it 'sets #order to "custom"' do
         config.order_groups { |groups| groups.reverse }
         expect(config.order).to eq("custom")
+      end
+
+      it 'prints a deprecation warning' do
+        expect_deprecation_with_call_site(__FILE__, __LINE__ + 1, /RSpec::Configuration#order_groups/)
+        config.order_groups { }
       end
     end
 
@@ -1570,6 +1591,41 @@ module RSpec::Core
 
       it 'sets a block that determines the ordering of a collection extended with Extensions::Ordered::ExampleGroups' do
         expect(groups.ordered).to eq([4, 3, 2, 1])
+      end
+    end
+
+    describe "#register_ordering(:global)" do
+      let(:examples) { [1, 2, 3, 4].extend Extensions::Ordered::Examples }
+      let(:groups)   { [1, 2, 3, 4].extend Extensions::Ordered::ExampleGroups }
+
+      before do
+        RSpec.stub(:configuration => config)
+        config.register_ordering(:global) { |list| list.reverse }
+      end
+
+      it 'sets a block that determines the ordering of a collection extended with Extensions::Ordered::Examples' do
+        expect(examples.ordered).to eq([4, 3, 2, 1])
+      end
+
+      it 'sets a block that determines the ordering of a collection extended with Extensions::Ordered::ExampleGroups' do
+        expect(groups.ordered).to eq([4, 3, 2, 1])
+      end
+
+      it 'sets #order to "custom"' do
+        expect(config.order).to eq("custom")
+      end
+
+      it 'raises an ArgumentError if given a symbol other than `:global`' do
+        expect {
+          config.register_ordering(:custom) { }
+        }.to raise_error(ArgumentError, /:global/)
+      end
+    end
+
+    describe "#order" do
+      it 'is deprecated' do
+        expect_warn_deprecation_with_call_site(__FILE__, __LINE__ + 1, /order/)
+        config.order
       end
     end
 
