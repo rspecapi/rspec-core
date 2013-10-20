@@ -230,8 +230,8 @@ An error occurred #{context}
       end
 
       # @private
-      def instance_exec(*args, &block)
-        @example_group_instance.instance_exec(*args, &block)
+      def instance_exec(example_or_procsy, &block)
+        @example_group_instance.instance_exec(example_or_procsy, &block)
       end
 
     private
