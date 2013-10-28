@@ -68,7 +68,12 @@ module RSpec::Core
                   '  [rand]    randomize the order of files, groups and examples',
                   '  [random]  alias for rand',
                   '  [random:SEED] e.g. --order random:123') do |o|
-          options[:order] = o
+          options[:order] = if o == 'default'
+                              RSpec.deprecate("RSpec's `--order default` CLI option.", :replacement => "`--order defined`")
+                              'defined'
+                            else
+                              o
+                            end
         end
 
         parser.on('--seed SEED', Integer, 'Equivalent of --order rand:SEED.') do |seed|

@@ -196,6 +196,25 @@ module RSpec::Core
           end
         end
       end
+
+      context "with default" do
+        it 'defines the order as defined' do
+          options = Parser.parse!(['--order', 'default'])
+          expect(options[:order]).to eq('defined')
+        end
+
+        it 'prints a deprecation warning' do
+          expect_deprecation_with_no_call_site(/default/)
+          Parser.parse!(['--order', 'default'])
+        end
+      end
+
+      context "with defined" do
+        it 'defines the order as defined' do
+          options = Parser.parse!(['--order', 'defined'])
+          expect(options[:order]).to eq('defined')
+        end
+      end
     end
 
     describe "--seed" do
