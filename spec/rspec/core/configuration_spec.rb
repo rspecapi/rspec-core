@@ -1404,10 +1404,16 @@ module RSpec::Core
     end
 
     describe "#force" do
-      it "forces order" do
+      it "forces order (when given default)" do
         config.force :order => "default"
         config.order = "rand"
         expect(config.order).to eq("default")
+      end
+
+      it "forces order (when given defined)" do
+        config.force :order => "defined"
+        config.order = "rand"
+        expect(config.order).to eq("defined")
       end
 
       it "forces order and seed with :order => 'rand:37'" do
@@ -1419,7 +1425,7 @@ module RSpec::Core
 
       it "forces order and seed with :seed => '37'" do
         config.force :seed => "37"
-        config.order = "default"
+        config.order = "defined"
         expect(config.seed).to eq(37)
         expect(config.order).to eq("rand")
       end
@@ -1493,25 +1499,27 @@ module RSpec::Core
         end
       end
 
-      context 'given "default"' do
-        before do
-          config.order = 'rand:123'
-          config.order = 'default'
-        end
+      %w[ default defined ].each do |order|
+        context "given '#{order}'" do
+          before do
+            config.order = 'rand:123'
+            config.order = order
+          end
 
-        it "sets the order to nil" do
-          expect(config.order).to be_nil
-        end
+          it "sets the order to nil" do
+            expect(config.order).to be_nil
+          end
 
-        it "sets the seed to nil" do
-          expect(config.seed).to be_nil
-        end
+          it "sets the seed to nil" do
+            expect(config.seed).to be_nil
+          end
 
-        it 'clears the random ordering' do
-          RSpec.stub(:configuration => config)
-          list = [1, 2, 3, 4].extend(Extensions::Ordered::Examples)
-          Kernel.should_not_receive(:rand)
-          expect(list.ordered).to eq([1, 2, 3, 4])
+          it 'clears the random ordering' do
+            RSpec.stub(:configuration => config)
+            list = [1, 2, 3, 4].extend(Extensions::Ordered::Examples)
+            Kernel.should_not_receive(:rand)
+            expect(list.ordered).to eq([1, 2, 3, 4])
+          end
         end
       end
     end

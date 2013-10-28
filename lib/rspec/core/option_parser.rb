@@ -63,8 +63,8 @@ module RSpec::Core
         end
 
         parser.on('--order TYPE[:SEED]', 'Run examples by the specified order type.',
-                  '  [default] files are ordered based on the underlying file',
-                  '            system\'s order',
+                  '  [defined] groups and examples are run in the order they are defined',
+                  '  [default] deprecated alias for defined',
                   '  [rand]    randomize the order of files, groups and examples',
                   '  [random]  alias for rand',
                   '  [random:SEED] e.g. --order random:123') do |o|
